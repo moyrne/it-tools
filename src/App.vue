@@ -12,12 +12,20 @@ const styleStore = useStyleStore();
 const theme = computed(() => (styleStore.isDarkTheme ? darkTheme : null));
 const themeOverrides = computed(() => (styleStore.isDarkTheme ? darkThemeOverrides : lightThemeOverrides));
 
-const { locale } = useI18n();
+const { locale, availableLocales } = useI18n();
 
-syncRef(
-  locale,
-  useStorage('locale', locale),
-);
+const storedLocale = useStorage('locale', () => {
+  try {
+    const browserLang = navigator.language?.slice(0, 2);
+    if (browserLang && availableLocales.includes(browserLang)) {
+      console.log("browserLang", browserLang);
+      return browserLang;
+    }
+  } catch {}
+  return 'en';
+});
+
+syncRef(storedLocale, locale);
 </script>
 
 <template>

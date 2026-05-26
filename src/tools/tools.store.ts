@@ -63,5 +63,16 @@ export const useToolStore = defineStore('tools', () => {
     updateFavoriteTools(newOrder: ToolWithCategory[]) {
       favoriteToolsName.value = newOrder.map(tool => tool.path);
     },
+
+    exportFavorites() {
+      return JSON.stringify(favoriteToolsName.value, null, 2);
+    },
+
+    importFavorites(data: string[]) {
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid format');
+      }
+      favoriteToolsName.value = data;
+    },
   };
 });

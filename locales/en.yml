@@ -27,6 +27,8 @@ home:
     darkMode: 'Dark mode'
     lightMode: 'Light mode'
     mode: 'Toggle dark/light mode'
+    exportFavorites: 'Export favorites'
+    importFavorites: 'Import favorites'
 about:
   content: >
     # About IT-Tools
@@ -257,6 +259,14 @@ tools:
     title: WiFi QR Code generator
     description: Generate and download QR codes for quick connections to WiFi networks.
 
+  xml-to-json:
+    title: XML to JSON
+    description: Convert XML to JSON.
+
+  json-to-xml:
+    title: JSON to XML
+    description: Convert JSON to XML.
+
   xml-formatter:
     title: XML formatter
     description: Prettify your XML string into a friendly, human-readable format.
@@ -388,6 +398,30 @@ tools:
   url-encoder:
     title: Encode/decode URL-formatted strings
     description: Encode text to URL-encoded format (also known as "percent-encoded"), or decode from it.
+
+  ascii-text-drawer:
+    title: ASCII Art Text Generator
+    description: Create ASCII art text with many fonts and styles.
+
+  email-normalizer:
+    title: Email normalizer
+    description: Normalize email addresses to a standard format for easier comparison. Useful for deduplication and data cleaning.
+
+  markdown-to-html:
+    title: Markdown to HTML
+    description: Convert Markdown to Html and allow to print (as PDF)
+
+  regex-memo:
+    title: Regex cheatsheet
+    description: Javascript Regex/Regular Expression cheatsheet
+
+  regex-tester:
+    title: Regex Tester
+    description: Test your regular expressions with sample text.
+
+  safelink-decoder:
+    title: Outlook Safelink decoder
+    description: Decode Outlook SafeLink links
 
   text-to-binary:
     title: Text to ASCII binary

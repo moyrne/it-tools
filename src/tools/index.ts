@@ -110,12 +110,12 @@ export const toolsByCategory: ToolCategory[] = [
       yamlToToml,
       jsonToYaml,
       jsonToToml,
-      listConverter,
       tomlToJson,
       tomlToYaml,
       xmlToJson,
       jsonToXml,
       markdownToHtml,
+      listConverter,
     ],
   },
   {
