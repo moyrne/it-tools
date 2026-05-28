@@ -426,3 +426,14 @@ tools:
   text-to-binary:
     title: Text to ASCII binary
     description: Convert text to its ASCII binary representation and vice-versa.
+
+auth:
+  login: Log in
+  register: Register
+  username: Username
+  usernamePlaceholder: Enter username
+  password: Password
+  switchToRegister: Don't have an account? Register
+  switchToLogin: Already have an account? Log in
+  logout: Log out
+  profile: Profile

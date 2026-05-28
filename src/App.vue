@@ -4,6 +4,7 @@ import { NGlobalStyle, NMessageProvider, NNotificationProvider, darkTheme } from
 import { darkThemeOverrides, lightThemeOverrides } from './themes';
 import { layouts } from './layouts';
 import { useStyleStore } from './stores/style.store';
+import { config } from './config';
 
 const route = useRoute();
 const layout = computed(() => route?.meta?.layout ?? layouts.base);
@@ -26,6 +27,22 @@ const storedLocale = useStorage('locale', () => {
 });
 
 syncRef(storedLocale, locale);
+
+watch(locale, (newLocale) => {
+  if (config.showAuth && localStorage.getItem('access_token')) {
+    import('@/services/preferences.service').then(({ patchPreferences }) => {
+      patchPreferences({ language: newLocale }).catch(() => {});
+    });
+  }
+});
+
+watch(() => styleStore.isDarkTheme, (isDark) => {
+  if (config.showAuth && localStorage.getItem('access_token')) {
+    import('@/services/preferences.service').then(({ patchPreferences }) => {
+      patchPreferences({ theme: isDark ? 'dark' : 'light' }).catch(() => {});
+    });
+  }
+});
 </script>
 
 <template>

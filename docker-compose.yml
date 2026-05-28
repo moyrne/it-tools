@@ -1,0 +1,35 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - VITE_SHOW_AUTH=${VITE_SHOW_AUTH:-false}
+      - VITE_SHOW_BANNER=${VITE_SHOW_BANNER:-false}
+      - VITE_SHOW_SPONSOR_BANNER=${VITE_SHOW_SPONSOR_BANNER:-false}
+      - VITE_TRACKER_ENABLED=${VITE_TRACKER_ENABLED:-false}
+      - VITE_PLAUSIBLE_DOMAIN=${VITE_PLAUSIBLE_DOMAIN:-}
+      - VITE_PLAUSIBLE_API_HOST=${VITE_PLAUSIBLE_API_HOST:-}
+      - VITE_VERCEL_ENV=${VITE_VERCEL_ENV:-production}
+      - VITE_VERCEL_GIT_COMMIT_SHA=${VITE_VERCEL_GIT_COMMIT_SHA:-}
+      - BASE_URL=${BASE_URL:-/}
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PB_PORT=8080
+      - PB_DATA_DIR=/pb_data
+      - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-change-me-in-production}
+    volumes:
+      - backend-data:/pb_data
+
+volumes:
+  backend-data:

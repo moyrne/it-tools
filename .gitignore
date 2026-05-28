@@ -16,6 +16,7 @@ coverage
 
 /cypress/videos/
 /cypress/screenshots/
+pb_data/
 
 # Editor directories and files
 .vscode/*
@@ -28,8 +29,12 @@ coverage
 *.sw?
 
 .env
+/backend/bin/
+/backend/data/
 /test-results/
 /playwright-report/
 /playwright/.cache/
 # Webkit with playwright creates a salt file
 salt
+backend/pb_data/auxiliary.db
+backend/pb_data/data.db

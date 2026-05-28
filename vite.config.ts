@@ -110,6 +110,14 @@ export default defineConfig({
   test: {
     exclude: [...configDefaults.exclude, '**/*.e2e.spec.ts'],
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8090',
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     target: 'esnext',
   },

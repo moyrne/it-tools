@@ -4,6 +4,9 @@ import type { Ref } from 'vue';
 import _ from 'lodash';
 import type { Tool, ToolCategory, ToolWithCategory } from './tools.types';
 import { toolsWithCategory } from './index';
+import { isAuthenticated } from '@/services/api';
+import * as favoritesService from '@/services/favorites.service';
+import { config } from '@/config';
 
 export const useToolStore = defineStore('tools', () => {
   const favoriteToolsName = useStorage('favoriteToolsName', []) as Ref<string[]>;
@@ -35,8 +38,18 @@ export const useToolStore = defineStore('tools', () => {
   const favoriteTools = computed(() => {
     return favoriteToolsName.value
       .map(favoriteName => tools.value.find(({ name, path }) => name === favoriteName || path === favoriteName))
-      .filter(Boolean) as ToolWithCategory[]; // cast because .filter(Boolean) does not remove undefined from type
+      .filter(Boolean) as ToolWithCategory[];
   });
+
+  async function syncToServer() {
+    if (config.showAuth && isAuthenticated()) {
+      try {
+        await favoritesService.updateFavorites(favoriteToolsName.value);
+      } catch {
+        // silently fail - localStorage fallback still works
+      }
+    }
+  }
 
   return {
     tools,
@@ -47,12 +60,14 @@ export const useToolStore = defineStore('tools', () => {
     addToolToFavorites({ tool }: { tool: MaybeRef<Tool> }) {
       const toolPath = get(tool).path;
       if (toolPath) {
-        favoriteToolsName.value.push(toolPath);
+        favoriteToolsName.value = [...favoriteToolsName.value, toolPath];
+        syncToServer();
       }
     },
 
     removeToolFromFavorites({ tool }: { tool: MaybeRef<Tool> }) {
       favoriteToolsName.value = favoriteToolsName.value.filter(name => get(tool).name !== name && get(tool).path !== name);
+      syncToServer();
     },
 
     isToolFavorite({ tool }: { tool: MaybeRef<Tool> }) {
@@ -62,6 +77,7 @@ export const useToolStore = defineStore('tools', () => {
 
     updateFavoriteTools(newOrder: ToolWithCategory[]) {
       favoriteToolsName.value = newOrder.map(tool => tool.path);
+      syncToServer();
     },
 
     exportFavorites() {
@@ -73,6 +89,25 @@ export const useToolStore = defineStore('tools', () => {
         throw new Error('Invalid format');
       }
       favoriteToolsName.value = data;
+      syncToServer();
+    },
+
+    async mergeAfterLogin() {
+      if (favoriteToolsName.value.length > 0) {
+        try {
+          const merged = await favoritesService.mergeFavorites(favoriteToolsName.value);
+          favoriteToolsName.value = merged;
+        } catch {
+          // fall back to localStorage
+        }
+      } else {
+        try {
+          const serverFavorites = await favoritesService.getFavorites();
+          favoriteToolsName.value = serverFavorites;
+        } catch {
+          // fall back to localStorage
+        }
+      }
     },
   };
 });

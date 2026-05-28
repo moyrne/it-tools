@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconDragDrop, IconHeart } from '@tabler/icons-vue';
+import { IconDragDrop, IconFileExport, IconFileImport, IconHeart } from '@tabler/icons-vue';
 import { useHead } from '@vueuse/head';
 import { ref, watch } from 'vue';
 import Draggable from 'vuedraggable';
@@ -14,6 +14,7 @@ useHead({ title: 'IT Tools - Handy online tools for developers' });
 const { t } = useI18n();
 
 const favoriteTools = ref([...toolStore.favoriteTools]);
+const importInput = ref<HTMLInputElement | null>(null);
 
 watch(() => toolStore.favoriteTools, (val) => {
   favoriteTools.value = [...val];
@@ -22,6 +23,35 @@ watch(() => toolStore.favoriteTools, (val) => {
 // Update favorite tools order when drag is finished
 function onUpdateFavoriteTools() {
   toolStore.updateFavoriteTools(favoriteTools.value); // Update the store with the new order
+}
+
+function handleExport() {
+  const json = toolStore.exportFavorites();
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'favorites.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function handleImport(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result as string);
+      toolStore.importFavorites(data);
+    } catch {
+      window.alert('Invalid JSON file');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
 }
 </script>
 
@@ -53,10 +83,23 @@ function onUpdateFavoriteTools() {
         <div v-if="toolStore.favoriteTools.length > 0">
           <h3 class="mb-5px mt-25px text-neutral-400 font-500">
             {{ $t('home.categories.favoriteTools') }}
-            <c-tooltip :tooltip="$t('home.categories.favoritesDndToolTip')">
-              <n-icon :component="IconDragDrop" size="18" />
-            </c-tooltip>
+            <span class="inline-flex items-center gap-4px ml-4px">
+              <c-tooltip :tooltip="$t('home.categories.favoritesDndToolTip')">
+                <n-icon :component="IconDragDrop" size="18" />
+              </c-tooltip>
+              <c-tooltip :tooltip="$t('home.nav.exportFavorites')" position="bottom">
+                <c-button circle variant="text" size="small" :aria-label="$t('home.nav.exportFavorites')" @click="handleExport">
+                  <n-icon size="18" :component="IconFileExport" />
+                </c-button>
+              </c-tooltip>
+              <c-tooltip :tooltip="$t('home.nav.importFavorites')" position="bottom">
+                <c-button circle variant="text" size="small" :aria-label="$t('home.nav.importFavorites')" @click="importInput?.click()">
+                  <n-icon size="18" :component="IconFileImport" />
+                </c-button>
+              </c-tooltip>
+            </span>
           </h3>
+          <input ref="importInput" type="file" accept=".json" hidden @change="handleImport" />
           <Draggable
             :list="favoriteTools"
             class="grid grid-cols-1 gap-12px lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-2 xl:grid-cols-4"

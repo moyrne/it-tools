@@ -65,11 +65,24 @@ export const config = figue({
     default: false,
     env: 'VITE_SHOW_SPONSOR_BANNER',
   },
+  showAuth: {
+    doc: 'Show the authentication (login/register) buttons',
+    format: 'boolean',
+    default: false,
+    env: 'VITE_SHOW_AUTH',
+  },
 })
   .loadEnv({
     ...import.meta.env,
     // Because the string 'import.meta.env.PACKAGE_VERSION' is statically replaced during build time (see 'define' in vite.config.ts)
     PACKAGE_VERSION: import.meta.env.PACKAGE_VERSION,
+    ...(typeof window !== 'undefined'
+      ? Object.fromEntries(
+          Object.entries(window.__ENV__ ?? {}).filter(
+            ([, v]) => typeof v !== 'string' || !/^\$\{.+}$/.test(v),
+          ),
+        )
+      : {}),
   })
   .validate()
   .getConfig();
